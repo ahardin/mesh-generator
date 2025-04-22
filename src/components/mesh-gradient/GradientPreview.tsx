@@ -19,7 +19,6 @@ interface GradientPreviewProps {
 export function GradientPreview({
   colorPoints,
   draggedPointId,
-  setDraggedPointId,
   dragPositionRef,
   animationFrameRef,
   updatePointPosition,
