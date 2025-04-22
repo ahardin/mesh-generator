@@ -1,4 +1,4 @@
-import MeshGradientGenerator from "@/components/mesh-gradient-generator"
+import MeshGradientGenerator from "@/components/mesh-gradient/MeshGradientGenerator"
 
 export default function Home() {
   return (
