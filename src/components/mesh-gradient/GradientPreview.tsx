@@ -5,6 +5,8 @@ import { ColorPoint, generateGradientCSS } from "./utils"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { Expand, Minimize, Eye, EyeOff } from "lucide-react"
 
 interface GradientPreviewProps {
   colorPoints: ColorPoint[]
@@ -25,7 +27,7 @@ export function GradientPreview({
   handlePointMouseDown,
 }: GradientPreviewProps) {
   const previewRef = useRef<HTMLDivElement>(null)
-  const [expanded, setExpanded] = useState(false)
+  const [viewState, setViewState] = useState<"hidden" | "collapsed" | "expanded">("collapsed")
   const [applyToBody, setApplyToBody] = useState(false)
 
   // Generate the gradient CSS
@@ -82,12 +84,22 @@ export function GradientPreview({
   return (
     <div className="relative">
       <div className="flex justify-center my-2 gap-4 items-center">
-        <Button
-          variant="outline"
-          onClick={() => setExpanded(!expanded)}
-        >
-          {expanded ? "Collapse" : "Expand"}
-        </Button>
+        <ToggleGroup type="single" value={viewState} onValueChange={(value) => {
+          if (value) setViewState(value as "hidden" | "collapsed" | "expanded");
+        }}>
+          <ToggleGroupItem value="hidden" aria-label="Hide preview">
+            <EyeOff className="h-4 w-4 mr-1" />
+            <span className="sr-only">Hide</span>
+          </ToggleGroupItem>
+          <ToggleGroupItem value="collapsed" aria-label="Collapse preview">
+            <Minimize className="h-4 w-4 mr-1" />
+            <span className="sr-only">Collapse</span>
+          </ToggleGroupItem>
+          <ToggleGroupItem value="expanded" aria-label="Expand preview">
+            <Expand className="h-4 w-4 mr-1" />
+            <span className="sr-only">Expand</span>
+          </ToggleGroupItem>
+        </ToggleGroup>
         <div className="flex items-center gap-2">
           <Checkbox
             id="apply-to-body"
@@ -99,31 +111,33 @@ export function GradientPreview({
           </Label>
         </div>
       </div>
-      <div
-        ref={previewRef}
-        className={`w-full rounded-lg shadow-md transition-all duration-500 relative cursor-move ${expanded ? 'h-192' : 'h-64'}`}
-        style={previewStyle}
-        onMouseMove={handlePreviewMouseMove}
-      >
-        {/* Draggable points */}
-        {colorPoints.map((point) => (
-          <div
-            key={point.id}
-            className="absolute w-6 h-6 rounded-full border-2 border-white shadow-md cursor-move transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
-            style={{
-              backgroundColor: point.color,
-              left: `${point.x}%`,
-              top: `${point.y}%`,
-              zIndex: draggedPointId === point.id ? 10 : 1,
-            }}
-            onMouseDown={(e) => handlePointMouseDown(point.id, e)}
-          >
-            <span className="text-xs text-white font-bold drop-shadow-md">
-              {colorPoints.findIndex((p) => p.id === point.id) + 1}
-            </span>
-          </div>
-        ))}
-      </div>
+      {viewState !== "hidden" && (
+        <div
+          ref={previewRef}
+          className={`w-full rounded-lg shadow-md transition-all duration-500 relative cursor-move ${viewState === "expanded" ? 'h-192' : 'h-64'}`}
+          style={previewStyle}
+          onMouseMove={handlePreviewMouseMove}
+        >
+          {/* Draggable points */}
+          {colorPoints.map((point) => (
+            <div
+              key={point.id}
+              className="absolute w-6 h-6 rounded-full border-2 border-white shadow-md cursor-move transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center"
+              style={{
+                backgroundColor: point.color,
+                left: `${point.x}%`,
+                top: `${point.y}%`,
+                zIndex: draggedPointId === point.id ? 10 : 1,
+              }}
+              onMouseDown={(e) => handlePointMouseDown(point.id, e)}
+            >
+              <span className="text-xs text-white font-bold drop-shadow-md">
+                {colorPoints.findIndex((p) => p.id === point.id) + 1}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 } 
