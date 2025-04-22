@@ -83,7 +83,7 @@ min-height: 100vh;`
   }, [colorPoints])
 
   // Add extracted colors to the gradient
-  const handleParseColors = useCallback((colorText: string) => {
+  const handleParseColors = useCallback((colorText: string, replaceExisting: boolean) => {
     const colors = extractColorsFromText(colorText)
     
     if (colors.length === 0) {
@@ -103,12 +103,19 @@ min-height: 100vh;`
       blur: 50,
     }))
 
-    setColorPoints((prevPoints) => [...prevPoints, ...newColorPoints])
-
-    toast({
-      title: "Colors added",
-      description: `Added ${colors.length} colors to your gradient.`,
-    })
+    if (replaceExisting) {
+      setColorPoints(newColorPoints)
+      toast({
+        title: "Colors replaced",
+        description: `Replaced with ${colors.length} new colors.`,
+      })
+    } else {
+      setColorPoints((prevPoints) => [...prevPoints, ...newColorPoints])
+      toast({
+        title: "Colors added",
+        description: `Added ${colors.length} colors to your gradient.`,
+      })
+    }
   }, [])
 
   // Add a new color point

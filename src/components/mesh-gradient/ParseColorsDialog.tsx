@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { FileText } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
@@ -15,15 +16,16 @@ import {
 } from "@/components/ui/dialog"
 
 interface ParseColorsDialogProps {
-  onParseColors: (colorText: string) => void
+  onParseColors: (colorText: string, replaceExisting: boolean) => void
 }
 
 export function ParseColorsDialog({ onParseColors }: ParseColorsDialogProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [colorText, setColorText] = useState("")
+  const [replaceExisting, setReplaceExisting] = useState(false)
 
   const handleParseColors = () => {
-    onParseColors(colorText)
+    onParseColors(colorText, replaceExisting)
     setIsOpen(false)
     setColorText("")
   }
@@ -50,6 +52,19 @@ rgb(255, 153, 102)
             onChange={(e) => setColorText(e.target.value)}
             className="min-h-[200px]"
           />
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="replace-colors" 
+              checked={replaceExisting}
+              onCheckedChange={() => setReplaceExisting(prev => !prev)}
+            />
+            <label 
+              htmlFor="replace-colors" 
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Replace existing colors (unchecked will add to existing colors)
+            </label>
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setIsOpen(false)}>
