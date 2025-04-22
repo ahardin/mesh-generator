@@ -54,7 +54,7 @@ export function ColorPointCard({
 
           <div>
             <Label htmlFor={`blur-${point.id}`} className="mb-2 block">
-              Blur/Smoothness: {point.blur}%
+              Blur: {point.blur}%
             </Label>
             <Slider
               id={`blur-${point.id}`}

@@ -7,6 +7,7 @@ import { Plus } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 import { ModeToggle } from '@/components/ui/mode-toggle'
+import { Slider } from "@/components/ui/slider"
 
 // Import utility functions and types
 import {
@@ -26,6 +27,9 @@ import { CssCodeDisplay } from "./CssCodeDisplay"
 import { ImportDialog } from "./ImportDialog"
 import { ParseColorsDialog } from "./ParseColorsDialog"
 
+// Default blur value
+const DEFAULT_BLUR = 75
+
 export default function MeshGradientGenerator() {
   // State for our color points
   const [colorPoints, setColorPoints] = useState<ColorPoint[]>([])
@@ -41,6 +45,9 @@ export default function MeshGradientGenerator() {
 
   // State to track if component is mounted (client-side)
   const [isMounted, setIsMounted] = useState(false)
+  
+  // State for the global blur value
+  const [globalBlur, setGlobalBlur] = useState(DEFAULT_BLUR)
 
   // Temporary state for dragging to avoid re-renders
   const dragPositionRef = useRef({ x: 0, y: 0 })
@@ -65,10 +72,10 @@ export default function MeshGradientGenerator() {
   useEffect(() => {
     if (isMounted && colorPoints.length === 0) {
       setColorPoints([
-        { id: generateId(), color: "#ff5e62", x: 0, y: 0, blur: 50 },
-        { id: generateId(), color: "#ff9966", x: 100, y: 0, blur: 50 },
-        { id: generateId(), color: "#6a82fb", x: 100, y: 100, blur: 50 },
-        { id: generateId(), color: "#fc5c7d", x: 0, y: 100, blur: 50 },
+        { id: generateId(), color: "#ff5e62", x: 0, y: 0, blur: DEFAULT_BLUR },
+        { id: generateId(), color: "#ff9966", x: 100, y: 0, blur: DEFAULT_BLUR },
+        { id: generateId(), color: "#6a82fb", x: 100, y: 100, blur: DEFAULT_BLUR },
+        { id: generateId(), color: "#fc5c7d", x: 0, y: 100, blur: DEFAULT_BLUR },
       ])
     }
   }, [isMounted, colorPoints.length])
@@ -81,6 +88,17 @@ background-attachment: fixed;
 min-height: 100vh;`
     setCssCode(css)
   }, [colorPoints])
+
+  // Apply global blur to all color points
+  const applyGlobalBlur = useCallback((blur: number) => {
+    setGlobalBlur(blur)
+    setColorPoints((prevPoints) =>
+      prevPoints.map((point) => ({
+        ...point,
+        blur,
+      }))
+    )
+  }, [])
 
   // Add extracted colors to the gradient
   const handleParseColors = useCallback((colorText: string, replaceExisting: boolean) => {
@@ -100,7 +118,7 @@ min-height: 100vh;`
       color,
       x: getRandomPosition(),
       y: getRandomPosition(),
-      blur: 50,
+      blur: DEFAULT_BLUR,
     }))
 
     if (replaceExisting) {
@@ -127,10 +145,10 @@ min-height: 100vh;`
         color: getRandomColor(),
         x: getRandomPosition(),
         y: getRandomPosition(),
-        blur: 50,
+        blur: globalBlur,
       },
     ])
-  }, [])
+  }, [globalBlur])
 
   // Remove a color point
   const removeColorPoint = useCallback((id: string) => {
@@ -332,10 +350,10 @@ min-height: 100vh;`
           // Find the transparent stop
           const transparentMatch = content.match(/transparent\s+(\d+(?:\.\d+)?)%/)
           if (!transparentMatch) {
-            console.log("No transparent stop found, using default 50%")
+            console.log("No transparent stop found, using default blur")
           }
 
-          const blur = transparentMatch ? parseFloat(transparentMatch[1]) : 50
+          const blur = transparentMatch ? parseFloat(transparentMatch[1]) : DEFAULT_BLUR
           console.log("Blur value:", blur)
 
           // Add the result
@@ -375,10 +393,10 @@ min-height: 100vh;`
               const posMatch = positionMatches[i].match(/(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%/)
               if (!posMatch) continue
 
-              // For blur, either use a match or default to 50%
+              // For blur, either use a match or default to default blur
               const blur = i < blurMatches.length
-                ? parseFloat(blurMatches[i].match(/(\d+(?:\.\d+)?)%/)?.[1] || "50")
-                : 50
+                ? parseFloat(blurMatches[i].match(/(\d+(?:\.\d+)?)%/)?.[1] || DEFAULT_BLUR.toString())
+                : DEFAULT_BLUR
 
               results.push({
                 x: parseFloat(posMatch[1]),
@@ -403,10 +421,10 @@ min-height: 100vh;`
             const posMatch = positionMatches[i].match(/(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%/)
             if (!posMatch) continue
 
-            // For blur, either use a match or default to 50%
+            // For blur, either use a match or default to default blur
             const blur = i < blurMatches.length
-              ? parseFloat(blurMatches[i].match(/(\d+(?:\.\d+)?)%/)?.[1] || "50")
-              : 50
+              ? parseFloat(blurMatches[i].match(/(\d+(?:\.\d+)?)%/)?.[1] || DEFAULT_BLUR.toString())
+              : DEFAULT_BLUR
 
             results.push({
               x: parseFloat(posMatch[1]),
@@ -512,6 +530,20 @@ min-height: 100vh;`
               All
             </Button>
           </div>
+        </div>
+
+        <div className="flex flex-wrap gap-4 items-center my-4">
+          <div className="font-medium">Global Blur:</div>
+          <div className="w-64">
+            <Slider
+              value={[globalBlur]}
+              min={10}
+              max={100}
+              step={1}
+              onValueChange={(values) => applyGlobalBlur(values[0])}
+            />
+          </div>
+          <div className="text-sm">{globalBlur}%</div>
         </div>
 
         <div className="space-y-6">

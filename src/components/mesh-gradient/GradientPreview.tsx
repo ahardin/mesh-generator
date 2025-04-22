@@ -2,11 +2,10 @@
 
 import { useRef, useCallback, useState, useEffect } from "react"
 import { ColorPoint, generateGradientCSS } from "./utils"
-import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { Expand, Minimize, Eye, EyeOff } from "lucide-react"
+import { Expand, Minimize, EyeOff } from "lucide-react"
 
 interface GradientPreviewProps {
   colorPoints: ColorPoint[]
