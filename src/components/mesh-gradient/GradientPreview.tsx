@@ -1,7 +1,10 @@
 "use client"
 
-import { useRef, useCallback, useState } from "react"
+import { useRef, useCallback, useState, useEffect } from "react"
 import { ColorPoint, generateGradientCSS } from "./utils"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
 
 interface GradientPreviewProps {
   colorPoints: ColorPoint[]
@@ -24,6 +27,7 @@ export function GradientPreview({
 }: GradientPreviewProps) {
   const previewRef = useRef<HTMLDivElement>(null)
   const [expanded, setExpanded] = useState(false)
+  const [applyToBody, setApplyToBody] = useState(false)
 
   // Generate the gradient CSS
   const gradientCSS = generateGradientCSS(colorPoints)
@@ -33,6 +37,25 @@ export function GradientPreview({
     backgroundImage: gradientCSS,
     backgroundSize: "100% 100%",
   }
+
+  // Apply gradient to body when checkbox is checked
+  useEffect(() => {
+    if (applyToBody) {
+      document.body.style.backgroundImage = gradientCSS;
+      document.body.style.backgroundSize = "100% 100%";
+      document.body.style.backgroundAttachment = "fixed";
+    } else {
+      document.body.style.backgroundImage = "";
+      document.body.style.backgroundSize = "";
+      document.body.style.backgroundAttachment = "";
+    }
+    
+    return () => {
+      document.body.style.backgroundImage = "";
+      document.body.style.backgroundSize = "";
+      document.body.style.backgroundAttachment = "";
+    };
+  }, [applyToBody, gradientCSS]);
 
   // Handle mouse move on the preview area
   const handlePreviewMouseMove = useCallback(
@@ -59,6 +82,24 @@ export function GradientPreview({
 
   return (
     <div className="relative">
+      <div className="flex justify-center my-2 gap-4 items-center">
+        <Button
+          variant="outline"
+          onClick={() => setExpanded(!expanded)}
+        >
+          {expanded ? "Collapse" : "Expand"}
+        </Button>
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="apply-to-body"
+            checked={applyToBody}
+            onCheckedChange={(checked) => setApplyToBody(checked === true)}
+          />
+          <Label htmlFor="apply-to-body" className="cursor-pointer">
+            Full-page preview
+          </Label>
+        </div>
+      </div>
       <div
         ref={previewRef}
         className={`w-full rounded-lg shadow-md transition-all duration-500 relative cursor-move ${expanded ? 'h-192' : 'h-64'}`}
@@ -83,14 +124,6 @@ export function GradientPreview({
             </span>
           </div>
         ))}
-      </div>
-      <div className="flex justify-center mt-4">
-        <button
-          className="bg-white hover:bg-gray-100 text-gray-800 px-4 py-2 rounded shadow transition-all"
-          onClick={() => setExpanded(!expanded)}
-        >
-          {expanded ? "Collapse" : "Expand"}
-        </button>
       </div>
     </div>
   )

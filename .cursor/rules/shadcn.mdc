@@ -1,0 +1,12 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+shadcn/ui components should be used whenever available. 
+
+If not installed, they should be installed with the following command: 
+
+`shadcn@latest add button` (for example)
+
+DO NOT use `shadcn-ui@latest` as that is deprecated in favor of `shadcn@latest`
