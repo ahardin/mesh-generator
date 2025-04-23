@@ -23,7 +23,7 @@ export function CssCodeDisplay({ cssCode }: CssCodeDisplayProps) {
     <Card>
       <CardContent className="pt-6">
         <div className="relative">
-          <pre className="bg-slate-950 dark:bg-slate-900 text-slate-50 p-4 rounded-md overflow-x-auto">
+          <pre className="bg-slate-950 dark:bg-slate-900 text-slate-50 p-4 rounded-md w-full overflow-x-auto whitespace-pre-wrap">
             <code>{cssCode}</code>
           </pre>
           <Button size="sm" variant="secondary" className="absolute top-2 right-2" onClick={copyCss}>

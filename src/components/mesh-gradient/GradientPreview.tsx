@@ -4,8 +4,6 @@ import { useRef, useCallback, useState, useEffect } from "react"
 import { ColorPoint, generateGradientCSS } from "./utils"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { Expand, Minimize, EyeOff } from "lucide-react"
 
 interface GradientPreviewProps {
   colorPoints: ColorPoint[]
@@ -26,7 +24,6 @@ export function GradientPreview({
   handlePointMouseDown,
 }: GradientPreviewProps) {
   const previewRef = useRef<HTMLDivElement>(null)
-  const [viewState, setViewState] = useState<"hidden" | "collapsed" | "expanded">("collapsed")
   const [applyToBody, setApplyToBody] = useState(false)
 
   // Generate the gradient CSS
@@ -83,22 +80,6 @@ export function GradientPreview({
   return (
     <div className="relative">
       <div className="flex justify-center my-2 gap-4 items-center">
-        <ToggleGroup type="single" value={viewState} onValueChange={(value) => {
-          if (value) setViewState(value as "hidden" | "collapsed" | "expanded");
-        }}>
-          <ToggleGroupItem value="hidden" aria-label="Hide preview">
-            <EyeOff className="h-4 w-4 mr-1" />
-            <span className="sr-only">Hide</span>
-          </ToggleGroupItem>
-          <ToggleGroupItem value="collapsed" aria-label="Collapse preview">
-            <Minimize className="h-4 w-4 mr-1" />
-            <span className="sr-only">Collapse</span>
-          </ToggleGroupItem>
-          <ToggleGroupItem value="expanded" aria-label="Expand preview">
-            <Expand className="h-4 w-4 mr-1" />
-            <span className="sr-only">Expand</span>
-          </ToggleGroupItem>
-        </ToggleGroup>
         <div className="flex items-center gap-2">
           <Checkbox
             id="apply-to-body"
@@ -110,10 +91,10 @@ export function GradientPreview({
           </Label>
         </div>
       </div>
-      {viewState !== "hidden" && (
+      {!applyToBody && (
         <div
           ref={previewRef}
-          className={`w-full rounded-lg shadow-md transition-all duration-500 relative cursor-move ${viewState === "expanded" ? 'h-192' : 'h-64'}`}
+          className="w-full rounded-lg shadow-md transition-all duration-500 relative cursor-move h-96 md:h-192"
           style={previewStyle}
           onMouseMove={handlePreviewMouseMove}
         >

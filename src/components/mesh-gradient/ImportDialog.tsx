@@ -63,27 +63,6 @@ export function ImportDialog({ onImport }: ImportDialogProps) {
               <li>Color: <code className="bg-secondary text-secondary-foreground px-1 py-0.5 rounded">COLOR 0%</code></li>
               <li>Transparency: <code className="bg-secondary text-secondary-foreground px-1 py-0.5 rounded">transparent Z%</code></li>
             </ul>
-            <Button
-              variant="link"
-              className="p-0 mt-2 h-auto text-xs"
-              onClick={() => {
-                setImportText("background: radial-gradient(at 0% 0%, #ff5e62 0%, transparent 50%), radial-gradient(at 100% 0%, #ff9966 0%, transparent 50%), radial-gradient(at 100% 100%, #6a82fb 0%, transparent 50%), radial-gradient(at 0% 100%, #fc5c7d 0%, transparent 50%);")
-              }}
-            >
-              Use test gradient
-            </Button>
-            <Button
-              variant="link"
-              className="p-0 ml-3 mt-2 h-auto text-xs"
-              onClick={() => {
-                setImportText(`background: 
-	radial-gradient(at 69% 13%, oklch(95.81% 0.03 73.18deg) 0%, transparent 50%), 
-	radial-gradient(at 14% 57%, oklch(91% 0.06 71.47deg) 0%, transparent 50%), 
-	radial-gradient(at 83% 86%, oklch(81.9% 0.11 69.97deg) 0%, transparent 50%);`)
-              }}
-            >
-              Use OKLCH gradient
-            </Button>
           </div>
           <Textarea
             placeholder="background: radial-gradient(at 0% 0%, #ff5e62 0%, transparent 50%), radial-gradient(at 100% 0%, #ff9966 0%, transparent 50%)..."

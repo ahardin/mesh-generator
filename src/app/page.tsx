@@ -2,8 +2,7 @@ import MeshGradientGenerator from "@/components/mesh-gradient/MeshGradientGenera
 
 export default function Home() {
   return (
-    <main className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">Mesh Gradient Generator</h1>
+    <main className="py-8 px-4">
       <MeshGradientGenerator />
     </main>
   )

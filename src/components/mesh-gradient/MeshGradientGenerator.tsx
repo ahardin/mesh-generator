@@ -45,7 +45,7 @@ export default function MeshGradientGenerator() {
 
   // State to track if component is mounted (client-side)
   const [isMounted, setIsMounted] = useState(false)
-  
+
   // State for the global blur value
   const [globalBlur, setGlobalBlur] = useState(DEFAULT_BLUR)
 
@@ -72,10 +72,10 @@ export default function MeshGradientGenerator() {
   useEffect(() => {
     if (isMounted && colorPoints.length === 0) {
       setColorPoints([
-        { id: generateId(), color: "#ff5e62", x: 0, y: 0, blur: DEFAULT_BLUR },
-        { id: generateId(), color: "#ff9966", x: 100, y: 0, blur: DEFAULT_BLUR },
-        { id: generateId(), color: "#6a82fb", x: 100, y: 100, blur: DEFAULT_BLUR },
-        { id: generateId(), color: "#fc5c7d", x: 0, y: 100, blur: DEFAULT_BLUR },
+        { id: generateId(), color: "#99d53d", x: 22.9, y: 17.1, blur: DEFAULT_BLUR },
+        { id: generateId(), color: "#0a4daf", x: 82.7, y: 11.8, blur: DEFAULT_BLUR },
+        { id: generateId(), color: "#233201", x: 84.6, y: 68.6, blur: DEFAULT_BLUR },
+        { id: generateId(), color: "#cd26a6", x: 31.9, y: 66.1, blur: DEFAULT_BLUR },
       ])
     }
   }, [isMounted, colorPoints.length])
@@ -103,7 +103,7 @@ min-height: 100vh;`
   // Add extracted colors to the gradient
   const handleParseColors = useCallback((colorText: string, replaceExisting: boolean) => {
     const colors = extractColorsFromText(colorText)
-    
+
     if (colors.length === 0) {
       toast({
         title: "No colors found",
@@ -486,77 +486,84 @@ min-height: 100vh;`
         <ImportDialog onImport={importGradient} />
         <ModeToggle />
       </div>
-      <Tabs defaultValue="preview" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="preview">Preview</TabsTrigger>
-          <TabsTrigger value="code">CSS Code</TabsTrigger>
-        </TabsList>
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="w-full md:w-3/4">
+          <Tabs defaultValue="preview" value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="preview">Preview</TabsTrigger>
+              <TabsTrigger value="code">CSS Code</TabsTrigger>
+            </TabsList>
 
-        <TabsContent value="preview" className="space-y-4">
-          <GradientPreview
-            colorPoints={colorPoints}
-            draggedPointId={draggedPointId}
-            setDraggedPointId={setDraggedPointId}
-            dragPositionRef={dragPositionRef}
-            animationFrameRef={animationFrameRef}
-            updatePointPosition={updatePointPosition}
-            handlePointMouseDown={handlePointMouseDown}
-          />
-        </TabsContent>
+            <TabsContent value="preview" className="space-y-4">
+              <GradientPreview
+                colorPoints={colorPoints}
+                draggedPointId={draggedPointId}
+                setDraggedPointId={setDraggedPointId}
+                dragPositionRef={dragPositionRef}
+                animationFrameRef={animationFrameRef}
+                updatePointPosition={updatePointPosition}
+                handlePointMouseDown={handlePointMouseDown}
+              />
+            </TabsContent>
 
-        <TabsContent value="code">
-          <CssCodeDisplay cssCode={cssCode} />
-        </TabsContent>
-      </Tabs>
-
-      <div className="space-y-4">
-        <div className="flex flex-wrap gap-2 justify-between">
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={addColorPoint}>
-              <Plus className="h-4 w-4 mr-2" /> Add Color
-            </Button>
-            <ParseColorsDialog onParseColors={handleParseColors} />
-          </div>
-
-          <div className="flex flex-wrap gap-2 items-center">
-            <h3 className="font-medium">Randomize</h3>
-            <Button variant="outline" onClick={randomizeColors}>
-              Colors
-            </Button>
-            <Button variant="outline" onClick={randomizePositions}>
-              Positions
-            </Button>
-            <Button variant="outline" onClick={randomizeAll}>
-              All
-            </Button>
-          </div>
+            <TabsContent value="code">
+              <CssCodeDisplay cssCode={cssCode} />
+            </TabsContent>
+          </Tabs>
         </div>
 
-        <div className="flex flex-wrap gap-4 items-center my-4">
-          <div className="font-medium">Global Blur:</div>
-          <div className="w-64">
-            <Slider
-              value={[globalBlur]}
-              min={10}
-              max={100}
-              step={1}
-              onValueChange={(values) => applyGlobalBlur(values[0])}
-            />
+        <div className="space-y-4">
+          <div className="flex flex-wrap gap-2 justify-between">
+            <div className="flex flex-wrap gap-2 items-center">
+              <h3 className="font-medium">Randomize</h3>
+              <Button variant="outline" onClick={randomizeColors}>
+                Colors
+              </Button>
+              <Button variant="outline" onClick={randomizePositions}>
+                Positions
+              </Button>
+              <Button variant="outline" onClick={randomizeAll}>
+                All
+              </Button>
+            </div>
           </div>
-          <div className="text-sm">{globalBlur}%</div>
-        </div>
 
-        <div className="space-y-6">
-          {colorPoints.map((point, index) => (
-            <ColorPointCard
-              key={point.id}
-              point={point}
-              index={index}
-              activeTab={activeTab}
-              updateColorPoint={updateColorPoint}
-              removeColorPoint={removeColorPoint}
-            />
-          ))}
+          <div className="flex flex-wrap gap-4 items-center my-4">
+            <div className="font-medium">Global Blur:</div>
+            <div className="grow">
+              <Slider
+                value={[globalBlur]}
+                min={10}
+                max={100}
+                step={1}
+                onValueChange={(values) => applyGlobalBlur(values[0])}
+              />
+            </div>
+            <div className="text-sm">{globalBlur}%</div>
+          </div>
+
+          <div className="flex flex-col md:flex-row gap-2">
+            <div className="w-full md:w-3/4">
+              <Button onClick={addColorPoint} className="w-full">
+                <Plus className="h-4 w-4 mr-2" /> Add Color
+              </Button>
+            </div>
+            <div className="w-full md:w-1/4">
+              <ParseColorsDialog onParseColors={handleParseColors} />
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            {colorPoints.map((point, index) => (
+              <ColorPointCard
+                key={point.id}
+                point={point}
+                index={index}
+                updateColorPoint={updateColorPoint}
+                removeColorPoint={removeColorPoint}
+              />
+            ))}
+          </div>
         </div>
       </div>
       <Toaster />

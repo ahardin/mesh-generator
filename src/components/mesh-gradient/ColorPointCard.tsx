@@ -7,12 +7,10 @@ import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Button } from "@/components/ui/button"
 import { Trash2 } from "lucide-react"
-import { cn } from "@/lib/utils"
 
 interface ColorPointCardProps {
   point: ColorPoint
   index: number
-  activeTab: string
   updateColorPoint: (id: string, field: keyof ColorPoint, value: string | number) => void
   removeColorPoint: (id: string) => void
 }
@@ -20,13 +18,12 @@ interface ColorPointCardProps {
 export function ColorPointCard({
   point,
   index,
-  activeTab,
   updateColorPoint,
   removeColorPoint,
 }: ColorPointCardProps) {
   return (
     <Card
-      className={cn("transition-all", activeTab === "preview" ? "border-2" : "")}
+      className="border-2"
       style={{ borderColor: point.color }}
     >
       <CardContent className="pt-6">
@@ -68,9 +65,11 @@ export function ColorPointCard({
         </div>
 
         <div className="mt-4 flex items-center justify-between">
-          <div className="text-sm text-gray-500">
+          
+        <div className="text-sm text-gray-500">
             Position: X: {point.x.toFixed(1)}%, Y: {point.y.toFixed(1)}%
           </div>
+
           <Button
             variant="ghost"
             size="sm"
