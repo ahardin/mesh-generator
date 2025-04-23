@@ -271,9 +271,6 @@ min-height: 100vh;`
   // Parse gradient CSS and update color points
   const importGradient = useCallback((importText: string) => {
     try {
-      // Log the exact input for debugging
-      console.log("Raw import text:", JSON.stringify(importText))
-
       // Clean up the input text but preserve structure
       const cleanedText = importText.trim()
 
@@ -282,7 +279,6 @@ min-height: 100vh;`
       const backgroundMatch = cleanedText.match(/background(?:-image)?\s*:\s*([^;]+)/i)
       if (backgroundMatch && backgroundMatch[1]) {
         gradientCSS = backgroundMatch[1].trim()
-        console.log("Found background property:", gradientCSS)
       }
 
       // Simple parsing approach: find all radial gradients
@@ -290,37 +286,29 @@ min-height: 100vh;`
 
       // First normalize the CSS by replacing newlines and excess spaces
       const normalizedCSS = gradientCSS.replace(/\n/g, ' ').replace(/\s+/g, ' ')
-      console.log("Normalized CSS:", normalizedCSS)
 
       // Extract all gradients
       const gradientDefinitions = extractGradients(normalizedCSS)
-      console.log("Extracted gradient definitions:", gradientDefinitions)
 
       // Process each gradient definition
       for (const gradientDef of gradientDefinitions) {
         try {
-          console.log("Processing gradient:", gradientDef)
-
           // Extract just the content inside the parentheses
           const contentMatch = gradientDef.match(/radial-gradient\s*\((.*)\)$/)
           if (!contentMatch) {
-            console.log("Couldn't extract gradient content")
             continue
           }
 
           const content = contentMatch[1].trim()
-          console.log("Gradient content:", content)
 
           // Extract the position part
           const positionMatch = content.match(/at\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%/)
           if (!positionMatch) {
-            console.log("No position match found")
             continue
           }
 
           const x = parseFloat(positionMatch[1])
           const y = parseFloat(positionMatch[2])
-          console.log("Position extracted:", x, y)
 
           // Find where the position part ends
           const positionText = positionMatch[0]
@@ -328,37 +316,27 @@ min-height: 100vh;`
 
           // The rest of the content after the position
           const afterPosition = content.substring(posEndIndex).trim()
-          console.log("After position:", afterPosition)
 
           // The first part before the next comma should be our color and 0%
           const firstStop = afterPosition.startsWith(',')
             ? afterPosition.substring(1).trim().split(',')[0].trim()
             : afterPosition.split(',')[0].trim()
 
-          console.log("First stop:", firstStop)
-
           // Extract the color (everything before 0%)
           const lastIndexOf0 = firstStop.lastIndexOf('0%')
           if (lastIndexOf0 === -1) {
-            console.log("No 0% found in first stop")
             continue
           }
 
           const color = firstStop.substring(0, lastIndexOf0).trim()
-          console.log("Color extracted:", color)
 
           // Find the transparent stop
           const transparentMatch = content.match(/transparent\s+(\d+(?:\.\d+)?)%/)
-          if (!transparentMatch) {
-            console.log("No transparent stop found, using default blur")
-          }
 
           const blur = transparentMatch ? parseFloat(transparentMatch[1]) : DEFAULT_BLUR
-          console.log("Blur value:", blur)
 
           // Add the result
           results.push({ x, y, color, blur })
-          console.log("Added gradient:", { x, y, color, blur })
 
         } catch (error) {
           console.error("Error processing gradient:", error)
@@ -367,24 +345,15 @@ min-height: 100vh;`
 
       // Fallback if needed
       if (results.length === 0) {
-        console.warn("No gradients found with normal parsing. Using fallback...")
-
         // Last resort: try extremely loose parsing to find anything that might work
         const positionMatches = normalizedCSS.match(/at\s+(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%/g) || []
         const colorMatches = normalizedCSS.match(/(?:oklch|rgb|rgba|hsl|hsla|#[0-9a-f]{3,8})[^,)]*?(?=\s+0%)/gi) || []
         const blurMatches = normalizedCSS.match(/transparent\s+(\d+(?:\.\d+)?)%/g) || []
 
-        console.log("Fallback found:", {
-          positions: positionMatches.length > 0 ? positionMatches : "none",
-          colors: colorMatches.length > 0 ? colorMatches : "none",
-          blurs: blurMatches.length > 0 ? blurMatches : "none"
-        })
-
         // If we have positions but no colors, try more aggressive color extraction
         if (positionMatches.length > 0 && colorMatches.length === 0) {
           // Use a looser regex for OKLCH specifically
           const oklchMatches = normalizedCSS.match(/oklch\s*\([^)]+\)/g) || []
-          console.log("Found OKLCH colors with looser regex:", oklchMatches)
 
           // If we found OKLCH colors, use them
           if (oklchMatches.length > 0) {
@@ -399,13 +368,6 @@ min-height: 100vh;`
                 : DEFAULT_BLUR
 
               results.push({
-                x: parseFloat(posMatch[1]),
-                y: parseFloat(posMatch[2]),
-                color: oklchMatches[i].trim(),
-                blur: blur
-              })
-
-              console.log("Added from OKLCH fallback:", {
                 x: parseFloat(posMatch[1]),
                 y: parseFloat(posMatch[2]),
                 color: oklchMatches[i].trim(),
@@ -432,18 +394,9 @@ min-height: 100vh;`
               color: colorMatches[i].trim(),
               blur: blur
             })
-
-            console.log("Added from standard fallback:", {
-              x: parseFloat(posMatch[1]),
-              y: parseFloat(posMatch[2]),
-              color: colorMatches[i].trim(),
-              blur: blur
-            })
           }
         }
       }
-
-      console.log("Final results:", results)
 
       if (results.length === 0) {
         throw new Error("No valid mesh gradients found. Make sure each gradient includes position, color and transparency values.")
@@ -482,9 +435,12 @@ min-height: 100vh;`
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-2 justify-end items-center">
-        <ImportDialog onImport={importGradient} />
-        <ModeToggle />
+      <div className="flex flex-wrap gap-2 justify-between items-center">
+        <h1 className="text-2xl font-bold font-mono">CSS Mesh Gradient Generator</h1>
+        <div className="flex flex-wrap gap-2 items-center">
+          <ImportDialog onImport={importGradient} />
+          <ModeToggle />
+        </div>
       </div>
       <div className="flex flex-col md:flex-row gap-4">
         <div className="w-full md:w-3/4">
